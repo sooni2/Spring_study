@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Timeline Service</title>
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@500&display=swap" rel="stylesheet">
     <script>
@@ -27,30 +28,38 @@
                     for (let i = 0; i < response.length; i++) {
                         let message = response[i];
                         let id = message['id'];
-                        let username = message['username'];
+                        let title = message['title'];
+                        let author = message['author'];
                         let contents = message['contents'];
                         let modifiedAt = message['modifiedAt'];
-                        addHTML(id, username, contents, modifiedAt);
+                        addHTML(id, title, author, contents, modifiedAt);
                     }
                 }
             });
         }
 
         // 메모 하나를 HTML로 만들어서 body 태그 내 원하는 곳에 붙입니다.
-        function addHTML(id, username, contents, modifiedAt) {
-            let tempHtml = makeMessage(id, username, contents, modifiedAt);
+        function addHTML(id, title, author, contents, modifiedAt) {
+            let tempHtml = makeMessage(id, title, author, contents, modifiedAt);
             $('#cards-box').append(tempHtml);
         }
 
-        function makeMessage(id, username, contents, modifiedAt) {
+        function makeMessage(id, title, author, contents, modifiedAt) {
             return `<div class="card">
-                        <!-- date/username 영역 -->
+                        <!-- date/author영역 -->
                         <div class="metadata">
                             <div class="date">
                                 ${modifiedAt}
                             </div>
-                            <div id="${id}-username" class="username">
-                                ${username}
+                            <div id="${id}-author" class="author">
+                                ${author}
+                            </div>
+
+                        </div>
+                        <!-- title/author 영역 -->
+                        <div class="jemok">
+                            <div id="${id}-title" class="title">
+                                ${title}
                             </div>
                         </div>
                         <!-- contents 조회/수정 영역-->
@@ -59,6 +68,10 @@
                                 ${contents}
                             </div>
                             <div id="${id}-editarea" class="edit">
+                                <label for="id-titlearea" class="label">제목</label>
+                                <input id="${id}-titlearea" class="te-edit" cols="30">
+                                <label for="id-authorarea" class="label">작성자</label>
+                                <input id="${id}-authorarea" class="te-edit" cols="30">
                                 <textarea id="${id}-textarea" class="te-edit" name="" id="" cols="30" rows="5"></textarea>
                             </div>
                         </div>
@@ -84,34 +97,79 @@
             return true;
         }
 
-        // 익명의 username을 만듭니다.
-        function genRandomName(length) {
-            let result = '';
-            let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            let charactersLength = characters.length;
-            for (let i = 0; i < length; i++) {
-                let number = Math.random() * charactersLength;
-                let index = Math.floor(number);
-                result += characters.charAt(index);
+
+        // 사용자가 작가명을 올바르게 입력하였는지 확인합니다.
+        function isValidAuthor(author) {
+            if (author == '') {
+                alert('작성자를 입력해주세요');
+                return false;
             }
-            return result;
+            if (author.length < 2) {
+                alert('작성자를 1글자 이상 입력해주세요');
+                return false;
+            }
+            return true;
         }
+
+        // 사용자가 제목을 올바르게 입력하였는지 확인합니다.
+        function isValidTitle(title) {
+            if (title == '') {
+                alert('제목을 입력해주세요');
+                return false;
+            }
+
+            return true;
+        }
+
+        // 사용자가 비밀번호를 올바르게 입력하였는지 확인합니다.
+        function isValidPassword(password) {
+            if (password == '') {
+                alert('비밀번호를 입력해주세요');
+                return false;
+            }
+            if (password.trim().length < 3) {
+                alert('비밀번호는 4글자 이상 입력해주세요');
+                return false;
+            }
+            return true;
+        }
+
 
         // 메모를 생성합니다.
         function writePost() {
             // 1. 작성한 메모를 불러옵니다.
+            let title = $('#title').val();
+            let author = $('#author').val();
+            let password = $('#password').val();
             let contents = $('#contents').val();
 
-            // 2. 작성한 메모가 올바른지 isValidContents 함수를 통해 확인합니다.
+            // 2. 작성한 정보가 올바른지 isValidContents 함수를 통해 확인합니다.
+            if (isValidTitle(title) == false) {
+                return;
+            }
+
+            if (isValidAuthor(author) == false) {
+                return;
+            }
+
+            if (isValidPassword(password) == false) {
+                return;
+            }
+
             if (isValidContents(contents) == false) {
                 return;
             }
 
-            // 3. genRandomName 함수를 통해 익명의 username을 만듭니다.
-            let username = genRandomName(10);
+
+            // 4. password를 암호화? hash?
 
             // 4. 전달할 data JSON으로 만듭니다.
-            let data = {'username': username, 'contents': contents};
+            let data = {
+                'title': title,
+                'author': author,
+                'password': password,
+                'contents': contents
+            };
 
             $.ajax({
                 type: "POST",
@@ -126,11 +184,16 @@
         }
 
         // 수정 버튼을 눌렀을 때, 기존 작성 내용을 textarea 에 전달합니다.
+        // 비밀번호를 확인 후 작성 내용을 textarea 에 전달해야 함
         // 숨길 버튼을 숨기고, 나타낼 버튼을 나타냅니다.
         function editPost(id) {
             showEdits(id);
             let contents = $(`#${id}-contents`).text().trim();
             $(`#${id}-textarea`).val(contents);
+            let title = $(`#${id}-title`).text().trim();
+            $(`#${id}-titlearea`).val(title);
+            let author = $(`#${id}-author`).text().trim();
+            $(`#${id}-authorarea`).val(author);
         }
 
         function showEdits(id) {
@@ -138,23 +201,36 @@
             $(`#${id}-submit`).show();
             $(`#${id}-delete`).show();
 
+            $(`#${id}-title`).hide();
             $(`#${id}-contents`).hide();
             $(`#${id}-edit`).hide();
         }
 
         // 메모를 수정합니다.
         function submitEdit(id) {
-            // 1. 작성 대상 메모의 username과 contents 를 확인합니다.
-            let username = $(`#${id}-username`).text().trim();
+            // 1. 작성 대상 메모의 작가명과 contents 를 확인합니다.
+            let author = $(`#${id}-authorarea`).val();
             let contents = $(`#${id}-textarea`).val().trim();
+            let title = $(`#${id}-titlearea`).val().trim();
 
             // 2. 작성한 메모가 올바른지 isValidContents 함수를 통해 확인합니다.
+            if (isValidTitle(title) == false) {
+                return;
+            }
+            if (isValidTitle(author) == false) {
+                return;
+            }
+
             if (isValidContents(contents) == false) {
                 return;
             }
 
             // 3. 전달할 data JSON으로 만듭니다.
-            let data = {'username': username, 'contents': contents};
+            let data = {
+                'title': title,
+                'author': author,
+                'contents': contents
+            };
 
             // 4. PUT /api/memos/{id} 에 data를 전달합니다.
             $.ajax({
@@ -170,6 +246,7 @@
         }
 
         function deleteOne(id) {
+
             $.ajax({
                 type: "DELETE",
                 url: `/api/memos/${id}`,
@@ -179,7 +256,6 @@
                 }
             })
         }
-
 
 
     </script>
@@ -218,13 +294,27 @@
             right: 17px;
         }
 
+        .label {
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 16px;
+            font-weight: normal;
+            font-stretch: normal;
+            font-style: normal;
+            line-height: 1;
+            letter-spacing: -0.96px;
+            text-align: left;
+            color: #f7ede2;
+            margin-bottom: 10px;
+            margin-top: 10px;
+        }
+
         .background-header {
             position: fixed;
             z-index: -1;
             top: 0px;
             width: 100%;
             height: 428px;
-            background-color: #339af0;
+            background-color: #3b252c;
         }
 
         .background-body {
@@ -269,13 +359,14 @@
         }
 
         textarea.field {
-            width: 502px !important;
+            width: 538px !important;
             height: 146px;
             border-radius: 5px;
             background-color: #ffffff;
             border: none;
             padding: 18px;
             resize: none;
+            margin-top: 10px;
         }
 
         textarea.field::placeholder {
@@ -319,8 +410,24 @@
 
         }
 
-        .card .metadata .username {
+        .card .metadata .author {
             margin-left: 20px;
+
+        }
+
+        .card .jemok {
+
+            word-wrap: break-word;
+            word-break: break-all;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 16px;
+            font-weight: normal;
+            font-stretch: normal;
+            font-style: normal;
+            line-height: 1;
+            letter-spacing: -0.96px;
+            text-align: left;
+            color: #868e96;
         }
 
         .contents {
@@ -397,9 +504,29 @@
         </p>
     </div>
     <div class="area-write">
-        <textarea class="field" placeholder="공유하고 싶은 소식을 입력하세요." name="contents" th:id="contents" cols="30"
-                  rows="10"></textarea>
-        <img src="/images/send.png" alt="" onclick="writePost()">
+        <div class="col-12">
+            <label for="title" class="label">제목</label>
+            <input class="form-control" id="title" placeholder="제목을 입력하세요." name="title" th:id="title" cols="30">
+        </div>
+        <div class="row justify-content-evenly">
+            <div class="col-6">
+                <label for="author" class="label">작성자</label>
+                <input class="form-control" id="author" placeholder="이름을 입력하세요." name="author" th:id="author" cols="30">
+            </div>
+            <div class="col-6">
+                <label for="password" class="label">비밀번호</label>
+                <input class="form-control" type="password" id="password" name="password" placeholder="비밀번호를 입력하세요."
+                       th:id="password"
+                       cols="30">
+            </div>
+        </div>
+        <div class="col-12">
+            <label for="contents" class="label">내용</label>
+            <textarea class="field" id="contents" placeholder="공유하고 싶은 소식을 입력하세요." name="contents" th:id="contents"
+                      cols="30"
+                      rows="10"></textarea>
+            <img src="/images/send.png" alt="" onclick="writePost()">
+        </div>
     </div>
     <div id="cards-box" class="area-read">
 
