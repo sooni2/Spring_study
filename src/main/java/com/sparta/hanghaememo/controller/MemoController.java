@@ -2,6 +2,7 @@ package com.sparta.hanghaememo.controller;
 
 import com.sparta.hanghaememo.dto.MemoRequestDto;
 import com.sparta.hanghaememo.entity.Memo;
+import com.sparta.hanghaememo.repository.MemoRepository;
 import com.sparta.hanghaememo.service.MemoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import java.util.List;
 public class MemoController {
 
     private final MemoService memoService;
+    private final MemoRepository memoRepository;
 
     @GetMapping("/")
     public ModelAndView home() {
@@ -21,7 +23,7 @@ public class MemoController {
     }
 
     @PostMapping("/api/memos")
-    public Memo createMemo(@RequestBody MemoRequestDto requestDto){
+    public Memo createMemo(@RequestBody MemoRequestDto requestDto) {
         return memoService.createMemo(requestDto);
     }
 
@@ -30,13 +32,27 @@ public class MemoController {
         return memoService.getMemos();
     }
 
+    //비밀번호 확인하기
     @PutMapping("/api/memos/{id}")
-    public Long updateMemo(@PathVariable Long id, @RequestBody MemoRequestDto requestDto){
-        return memoService.update(id, requestDto);
+    public Long updateMemo(@PathVariable Long id, @RequestBody MemoRequestDto requestDto) {
+        Memo memo = memoRepository.findById(id).orElseThrow(
+                () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
+        );
+        if (memo.getPassword().equals(requestDto.getPassword())) {
+            memoService.update(id, requestDto);
+            return id;
+        } else return 0L;
     }
 
     @DeleteMapping("/api/memos/{id}")
-    public  Long deleteMemo(@PathVariable Long id){
-        return memoService.deleteMemo(id);
+    public Long deleteMemo(@PathVariable Long id, @RequestBody MemoRequestDto requestDto) {
+        Memo memo = memoRepository.findById(id).orElseThrow(
+                () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
+        );
+
+        if (memo.getPassword().equals(requestDto.getPassword())) {
+            memoService.deleteMemo(id);
+            return id;
+        } else return 0L;
     }
 }

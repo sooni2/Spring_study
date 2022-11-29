@@ -29,10 +29,7 @@ public class Memo extends Timestamped {
     private String password;
 
 
-
-
-
-    public Memo(MemoRequestDto requestDto){
+    public Memo(MemoRequestDto requestDto) {
         this.contents = requestDto.getContents();
         this.title = requestDto.getTitle();
         this.author = requestDto.getAuthor();
@@ -43,6 +40,7 @@ public class Memo extends Timestamped {
         this.contents = requestDto.getContents();
         this.title = requestDto.getTitle();
         this.author = requestDto.getAuthor();
+        this.password = requestDto.getPassword();
 
     }
 }

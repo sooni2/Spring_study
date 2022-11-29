@@ -32,25 +32,31 @@
                         let author = message['author'];
                         let contents = message['contents'];
                         let modifiedAt = message['modifiedAt'];
-                        addHTML(id, title, author, contents, modifiedAt);
+                        let createdAt = message['createdAt'];
+                        let password = message['password']
+                        addHTML(id, title, author, contents, createdAt, modifiedAt, password);
                     }
                 }
             });
         }
 
         // 메모 하나를 HTML로 만들어서 body 태그 내 원하는 곳에 붙입니다.
-        function addHTML(id, title, author, contents, modifiedAt) {
-            let tempHtml = makeMessage(id, title, author, contents, modifiedAt);
+        function addHTML(id, title, author, contents, createdAt, modifiedAt) {
+            let tempHtml = makeMessage(id, title, author, contents, createdAt, modifiedAt);
             $('#cards-box').append(tempHtml);
         }
 
-        function makeMessage(id, title, author, contents, modifiedAt) {
+        function makeMessage(id, title, author, contents, createdAt, modifiedAt) {
             return `<div class="card">
                         <!-- date/author영역 -->
                         <div class="metadata">
                             <div class="date">
+                                ${createdAt}
+                            </div>
+                            <div class="date">
                                 ${modifiedAt}
                             </div>
+                            <br/>
                             <div id="${id}-author" class="author">
                                 ${author}
                             </div>
@@ -72,14 +78,22 @@
                                 <input id="${id}-titlearea" class="te-edit" cols="30">
                                 <label for="id-authorarea" class="label">작성자</label>
                                 <input id="${id}-authorarea" class="te-edit" cols="30">
-                                <textarea id="${id}-textarea" class="te-edit" name="" id="" cols="30" rows="5"></textarea>
+                                <textarea id="${id}-textarea" class="te-edit" cols="30" rows="5"></textarea>
                             </div>
+                            <div id="${id}-pwcheckarea" class="edit">
+                                <label for="id-pwcheck" class="label">비밀번호</label>
+                                <input id="${id}-pwcheck" type="password" cols="30">
+                            </div>
+
+
                         </div>
                         <!-- 버튼 영역-->
                         <div class="footer">
+
                             <img id="${id}-edit" class="icon-start-edit" src="/images/edit.png" alt="" onclick="editPost('${id}')">
-                            <img id="${id}-delete" class="icon-delete" src="/images/delete.png" alt="" onclick="deleteOne('${id}')">
+                            <img id="${id}-delete" class="icon-start-delete" src="/images/delete.png" alt="" onclick="deleteOne('${id}')">
                             <img id="${id}-submit" class="icon-end-edit" src="/images/done.png" alt="" onclick="submitEdit('${id}')">
+                            <img id="${id}-terminate" class="icon-end-delete" src="/images/delete.png" alt="" onclick="terminateOne('${id}')">
                         </div>
                     </div>`;
         }
@@ -161,7 +175,7 @@
             }
 
 
-            // 4. password를 암호화? hash?
+            // password를 암호화? hash?
 
             // 4. 전달할 data JSON으로 만듭니다.
             let data = {
@@ -198,13 +212,16 @@
 
         function showEdits(id) {
             $(`#${id}-editarea`).show();
+            $(`#${id}-pwcheckarea`).show();
             $(`#${id}-submit`).show();
             $(`#${id}-delete`).show();
 
             $(`#${id}-title`).hide();
             $(`#${id}-contents`).hide();
             $(`#${id}-edit`).hide();
+            $(`#${id}-terminate`).hide();
         }
+
 
         // 메모를 수정합니다.
         function submitEdit(id) {
@@ -212,6 +229,8 @@
             let author = $(`#${id}-authorarea`).val();
             let contents = $(`#${id}-textarea`).val().trim();
             let title = $(`#${id}-titlearea`).val().trim();
+            let password = $(`#${id}-pwcheck`).val();
+
 
             // 2. 작성한 메모가 올바른지 isValidContents 함수를 통해 확인합니다.
             if (isValidTitle(title) == false) {
@@ -229,8 +248,10 @@
             let data = {
                 'title': title,
                 'author': author,
-                'contents': contents
+                'contents': contents,
+                'password': password
             };
+
 
             // 4. PUT /api/memos/{id} 에 data를 전달합니다.
             $.ajax({
@@ -239,22 +260,53 @@
                 contentType: "application/json",
                 data: JSON.stringify(data),
                 success: function (response) {
-                    alert('메시지 변경에 성공하였습니다.');
-                    window.location.reload();
+                    if (response != 0) {
+                        alert('메시지 변경에 성공하였습니다.');
+                        window.location.reload();
+                    } else {
+                        alert('비밀번호를 확인해주세요');
+                    }
+
                 }
             });
         }
 
+
         function deleteOne(id) {
+            $(`#${id}-title`).hide();
+            $(`#${id}-contents`).hide();
+            $(`#${id}-edit`).hide();
+            $(`#${id}-delete`).hide();
+
+            $(`#${id}-pwcheckarea`).show();
+            $(`#${id}-terminate`).show();
+
+        }
+
+        function terminateOne(id) {
+
+            let password = $(`#${id}-pwcheck`).val();
+
+
+            let data = {
+                'password': password
+            };
 
             $.ajax({
                 type: "DELETE",
                 url: `/api/memos/${id}`,
+                contentType: "application/json",
+                data: JSON.stringify(data),
                 success: function (response) {
-                    alert('메시지 삭제에 성공하였습니다.');
-                    window.location.reload();
+                    if (response != 0) {
+                        alert('메시지 삭제에 성공하였습니다.');
+                        window.location.reload();
+                    } else {
+                        alert('비밀번호를 확인해주세요')
+                    }
                 }
             })
+
         }
 
 
@@ -283,6 +335,18 @@
         .area-write {
             position: relative;
             width: 538px;
+        }
+
+        .area-write .form-control {
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 16px;
+            font-weight: normal;
+            font-stretch: normal;
+            font-style: normal;
+            line-height: 1;
+            letter-spacing: -0.96px;
+            text-align: left;
+            color: #868e96;
         }
 
         .area-write img {
@@ -393,6 +457,7 @@
         .card .metadata {
             position: relative;
             display: flex;
+            flex-direction: row-reverse;
             font-family: 'Spoqa Han Sans';
             font-size: 11px;
             font-weight: normal;
@@ -416,11 +481,13 @@
         }
 
         .card .jemok {
-
+            margin-left: 20px;
+            margin-top: 20px;
+            margin-bottom: 10px;
             word-wrap: break-word;
             word-break: break-all;
             font-family: 'Noto Sans KR', sans-serif;
-            font-size: 16px;
+            font-size: 20px;
             font-weight: normal;
             font-stretch: normal;
             font-style: normal;
@@ -450,6 +517,10 @@
             font-family: 'Spoqa Han Sans';
         }
 
+        .te-edit .label {
+            color: #212529;
+        }
+
         .footer {
             position: relative;
             height: 40px;
@@ -474,7 +545,7 @@
             height: 15px;
         }
 
-        .footer img.icon-delete {
+        .footer img.icon-start-delete {
             cursor: pointer;
             position: absolute;
             bottom: 12px;
@@ -482,6 +553,17 @@
             width: 14px;
             height: 18px;
         }
+
+        .footer img.icon-end-delete {
+            cursor: pointer;
+            position: absolute;
+            display: none;
+            bottom: 12px;
+            right: 19px;
+            width: 14px;
+            height: 18px;
+        }
+
 
         #cards-box {
             margin-top: 12px;
