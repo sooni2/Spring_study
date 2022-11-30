@@ -1,5 +1,18 @@
 	1.	수정, 삭제 API의 request를 어떤 방식으로 사용하셨나요? (param, query, body)
+		- @RequestBody를 사용해서 RequestDto에 있는 변수들을 다 불러왔습니다.
+
 	2.	어떤 상황에 어떤 방식의 request를 써야하나요?
+		- RequestParam : GET 방식으로 값을 전달하여 사용할 때 사용합니다.
+		- RequestBody : POST, PUT, DELETE, PATCH 등으로 값을 전달할 때 사용합니다.
+
 	3.	RESTful한 API를 설계했나요? 어떤 부분이 그런가요? 어떤 부분이 그렇지 않나요?
+		- api가 적절하게  http를 준수하며 잘 설계되어 RESTful 하게 설계되어 있다고 할 수 있습니다.
+		- 비밀번호 확인 부분을 따로 api 를 만들수 있으면 더 좋았을 것 같습니다.
+
 	4.	적절한 관심사 분리를 적용하였나요? (Controller, Repository, Service)
+		- controller: MemoController
+		- entity.   : Memo, Timestamped
+		- repository: MemoRepository
+		- service.  : MemoService
+		
 	5.	API 명세서 작성 가이드라인을 검색하여 직접 작성한 API 명세서와 비교해보세요!
