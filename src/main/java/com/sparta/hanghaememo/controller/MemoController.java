@@ -35,9 +35,7 @@ public class MemoController {
     //비밀번호 확인하기
     @PutMapping("/api/memos/{id}")
     public Long updateMemo(@PathVariable Long id, @RequestBody MemoRequestDto requestDto) {
-        Memo memo = memoRepository.findById(id).orElseThrow(
-                () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
-        );
+        Memo memo = getMemo(id);
         if (memo.getPassword().equals(requestDto.getPassword())) {
             memoService.update(id, requestDto);
             return id;
@@ -46,13 +44,19 @@ public class MemoController {
 
     @DeleteMapping("/api/memos/{id}")
     public Long deleteMemo(@PathVariable Long id, @RequestBody MemoRequestDto requestDto) {
-        Memo memo = memoRepository.findById(id).orElseThrow(
-                () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
-        );
-
+        Memo memo = getMemo(id);
         if (memo.getPassword().equals(requestDto.getPassword())) {
             memoService.deleteMemo(id);
             return id;
         } else return 0L;
     }
+
+    //중복 메소드 묶기
+    private Memo getMemo(Long id) {
+        Memo memo = memoRepository.findById(id).orElseThrow(
+                () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
+        );
+        return memo;
+    }
 }
+
