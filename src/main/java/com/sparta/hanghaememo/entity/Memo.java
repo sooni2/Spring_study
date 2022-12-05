@@ -6,8 +6,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
+import lombok.Setter;
 
 @Getter
+@Setter
 @Entity
 @NoArgsConstructor
 public class Memo extends Timestamped {
@@ -26,21 +28,19 @@ public class Memo extends Timestamped {
     private String contents;
 
     @Column(nullable = false)
-    private String password;
+    private Long userId;
 
 
-    public Memo(MemoRequestDto requestDto) {
+    public Memo(MemoRequestDto requestDto, Long userId) {
         this.contents = requestDto.getContents();
         this.title = requestDto.getTitle();
         this.author = requestDto.getAuthor();
-        this.password = requestDto.getPassword();
+        this.userId = userId;
     }
 
     public void update(MemoRequestDto requestDto) {
         this.contents = requestDto.getContents();
         this.title = requestDto.getTitle();
         this.author = requestDto.getAuthor();
-        this.password = requestDto.getPassword();
-
     }
 }
