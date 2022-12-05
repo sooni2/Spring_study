@@ -4,6 +4,7 @@ import com.sparta.hanghaememo.dto.MemoRequestDto;
 import com.sparta.hanghaememo.entity.Memo;
 import com.sparta.hanghaememo.repository.MemoRepository;
 import com.sparta.hanghaememo.service.MemoService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -22,24 +23,17 @@ public class MemoController {
         return new ModelAndView("index");
     }
 
+    //게시글 작성하기
     @PostMapping("/api/memos")
-    public Memo createMemo(@RequestBody MemoRequestDto requestDto) {
-        return memoService.createMemo(requestDto);
+    public Memo createMemo(@RequestBody MemoRequestDto requestDto, HttpServletRequest request) {
+        return memoService.createMemo(requestDto, request);
     }
 
+    //게시글 조회하기
     @GetMapping("/api/memos")
-    public List<Memo> getMemos() {
-        return memoService.getMemos();
-    }
+    public List<MemoRequestDto> getMemos(HttpServletRequest request) {
 
-    //비밀번호 확인하기
-    @PutMapping("/api/memos/{id}")
-    public Long updateMemo(@PathVariable Long id, @RequestBody MemoRequestDto requestDto) {
-        Memo memo = getMemo(id);
-        if (memo.getPassword().equals(requestDto.getPassword())) {
-            memoService.update(id, requestDto);
-            return id;
-        } else return 0L;
+        return memoService.getMemos(request);
     }
 
     @DeleteMapping("/api/memos/{id}")
