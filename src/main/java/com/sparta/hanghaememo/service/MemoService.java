@@ -1,6 +1,7 @@
 package com.sparta.hanghaememo.service;
 
 import com.sparta.hanghaememo.dto.MemoRequestDto;
+import com.sparta.hanghaememo.dto.MemoResponseDto;
 import com.sparta.hanghaememo.entity.Memo;
 import com.sparta.hanghaememo.entity.User;
 import com.sparta.hanghaememo.entity.UserRoleEnum;
@@ -25,7 +26,7 @@ public class MemoService {
 
     //게시글 작성
     @Transactional
-    public Memo createMemo(MemoRequestDto requestDto, HttpServletRequest request) {
+    public MemoResponseDto createMemo(MemoRequestDto requestDto, HttpServletRequest request) {
         //Request에서 Token 가져오기
         String token = jwtUtil.resolveToken(request);
         Claims claims;
@@ -45,9 +46,9 @@ public class MemoService {
             );
 
             //요청 받은 Dto로 DB에 저장할 객체 만들기
-            Memo memo = memoRepository.saveAndFlush(new Memo(requestDto, user.getId()));
+            Memo memo = memoRepository.saveAndFlush(new Memo(requestDto, user.getId(), user.getUsername()));
 
-            return new MemoRequestDto(memo);
+            return new MemoResponseDto(memo);
         } else {
             return null;
         }
@@ -76,7 +77,7 @@ public class MemoService {
 
             //사용자 권한 가져와서 ADMIN 이면 전체 조회, USER 이면 본인이 작성한 게시글만 조회
             UserRoleEnum userRoleEnum = user.getRole();
-            List<MemoRequestDto> list = new ArrayList<>();
+            List<MemoRequestDto> memoRequestDtoList = new ArrayList<>();
             List<Memo> memoList;
 
             if (userRoleEnum == UserRoleEnum.USER) {
@@ -87,30 +88,75 @@ public class MemoService {
             }
 
             for (Memo memo : memoList) {
-                list.add(new MemoRequestDto(memo));
+                memoRequestDtoList.add(new MemoRequestDto(memo));
             }
 
-            return list;
+            return memoRequestDtoList;
         } else {
             return null;
         }
-
     }
 
-
+    //게시글 수정
     @Transactional
-    public Long update(Long id, MemoRequestDto requestDto) {
-        Memo memo = memoRepository.findById(id).orElseThrow(
-                () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
-        );
+    public Memo update(Long id, MemoRequestDto requestDto, HttpServletRequest request) {
+        //Request에서 Token 가져오기
+        String token = jwtUtil.resolveToken(request);
+        Claims claims;
 
-        memo.update(requestDto);
-        return memo.getId();
+        //토큰이 있는 경우에만 게시글 수정 가능
+        if (token != null) {
+            if (jwtUtil.validateToken(token)) {
+                //토큰에서 사용자 정보 가져오기
+                claims = jwtUtil.getUserInfoFromToken(token);
+            } else {
+                throw new IllegalArgumentException("Token Error");
+            }
+
+            //토큰에서 가져온 사용자 정보를 사용하여 DB 조회
+            User user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
+                    () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
+            );
+
+            Memo memo = memoRepository.findByIdAndUserId(id, user.getId()).orElseThrow(
+                    () -> new NullPointerException("해당 게시글은 존재하지 않습니다.")
+            );
+
+            memo.update(requestDto);
+            return memo;
+        } else {
+            return null;
+        }
     }
 
     @Transactional
-    public Long deleteMemo(Long id) {
-        memoRepository.deleteById(id);
-        return id;
+    public Long deleteMemo(Long id, HttpServletRequest request) {
+        //Request에서 Token 가져오기
+        String token = jwtUtil.resolveToken(request);
+        Claims claims;
+
+        //토큰이 있는 경우에만 게시글 삭제 가능
+        if (token != null) {
+            if (jwtUtil.validateToken(token)) {
+                //토큰에서 사용자 정보 가져오기
+                claims = jwtUtil.getUserInfoFromToken(token);
+            } else {
+                throw new IllegalArgumentException("Token Error");
+            }
+
+            //토큰에서 가져온 사용자 정보를 사용하여 DB 조회
+            User user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
+                    () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
+            );
+
+            Memo memo = memoRepository.findByIdAndUserId(id, user.getId()).orElseThrow(
+                    () -> new NullPointerException("해당 게시글은 존재하지 않습니다.")
+            );
+
+            memoRepository.deleteById(id);
+            return memo.getId();
+        } else {
+            return null;
+        }
     }
 }
