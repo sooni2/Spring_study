@@ -6,41 +6,39 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
-import lombok.Setter;
 
 @Getter
-@Setter
 @Entity
 @NoArgsConstructor
 public class Memo extends Timestamped {
-
+    //메모 아이디
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
     private String title;
 
     @Column(nullable = false)
-    private String author;
-
-    @Column(nullable = false)
     private String contents;
-
+    //유저 아이디
     @Column(nullable = false)
     private Long userId;
 
+    @Column(nullable = false)
+    private String username;
 
-    public Memo(MemoRequestDto requestDto, Long userId) {
+
+    public Memo(MemoRequestDto requestDto, Long id, String username) {
         this.contents = requestDto.getContents();
         this.title = requestDto.getTitle();
-        this.author = requestDto.getAuthor();
-        this.userId = userId;
+        this.userId = id;
+        this.username = username;
     }
 
     public void update(MemoRequestDto requestDto) {
         this.contents = requestDto.getContents();
         this.title = requestDto.getTitle();
-        this.author = requestDto.getAuthor();
     }
+
 }
