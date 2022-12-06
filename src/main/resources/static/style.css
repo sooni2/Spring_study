@@ -1,0 +1,255 @@
+@import url(//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSans-kr.css);
+
+body {
+    margin: 0px;
+}
+
+.area-edit {
+    display: none;
+}
+
+.wrap {
+    width: 538px;
+    margin: 10px auto;
+}
+
+#contents {
+    width: 538px;
+}
+
+.area-write {
+    position: relative;
+    width: 538px;
+}
+
+.area-write .form-control {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 16px;
+    font-weight: normal;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1;
+    letter-spacing: -0.96px;
+    text-align: left;
+    color: #868e96;
+}
+
+.area-write img {
+    cursor: pointer;
+    position: absolute;
+    width: 22.2px;
+    height: 18.7px;
+    bottom: 15px;
+    right: 17px;
+}
+
+.label {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 16px;
+    font-weight: normal;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1;
+    letter-spacing: -0.96px;
+    text-align: left;
+    color: #f7ede2;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+.background-header {
+    position: fixed;
+    z-index: -1;
+    top: 0px;
+    width: 100%;
+    height: 428px;
+    background-color: #3b252c;
+}
+
+.background-body {
+    position: fixed;
+    z-index: -1;
+    top: 428px;
+    height: 100%;
+    width: 100%;
+    background-color: #dee2e6;
+}
+
+.header {
+    margin-top: 50px;
+}
+
+.header h2 {
+    /*font-family: 'Noto Sans KR', sans-serif;*/
+    height: 33px;
+    font-size: 42px;
+    font-weight: 500;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 0.79;
+    letter-spacing: -0.5px;
+    text-align: center;
+    color: #ffffff;
+}
+
+.header p {
+    margin: 40px auto;
+    width: 217px;
+    height: 48px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.5;
+    letter-spacing: -1.12px;
+    text-align: center;
+    color: #ffffff;
+}
+
+textarea.field {
+    width: 538px !important;
+    height: 146px;
+    border-radius: 5px;
+    background-color: #ffffff;
+    border: none;
+    padding: 18px;
+    resize: none;
+    margin-top: 10px;
+}
+
+textarea.field::placeholder {
+    width: 216px;
+    height: 16px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 16px;
+    font-weight: normal;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1;
+    letter-spacing: -0.96px;
+    text-align: left;
+    color: #868e96;
+}
+
+.card {
+    width: 538px;
+    border-radius: 5px;
+    background-color: #ffffff;
+    margin-bottom: 12px;
+}
+
+.card .metadata {
+    position: relative;
+    display: flex;
+    flex-direction: row-reverse;
+    font-family: 'Spoqa Han Sans';
+    font-size: 11px;
+    font-weight: normal;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1;
+    letter-spacing: -0.77px;
+    text-align: left;
+    color: #adb5bd;
+    height: 14px;
+    padding: 10px 23px;
+}
+
+.card .metadata .date {
+
+}
+
+.card .metadata .author {
+    margin-left: 20px;
+
+}
+
+.card .jemok {
+    margin-left: 20px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    word-wrap: break-word;
+    word-break: break-all;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 20px;
+    font-weight: normal;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1;
+    letter-spacing: -0.96px;
+    text-align: left;
+    color: #868e96;
+}
+
+.contents {
+    padding: 0px 23px;
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
+.contents div.edit {
+    display: none;
+}
+
+.contents textarea.te-edit {
+    border-right: none;
+    border-top: none;
+    border-left: none;
+    resize: none;
+    border-bottom: 1px solid #212529;
+    width: 100%;
+    font-family: 'Spoqa Han Sans';
+}
+
+.te-edit .label {
+    color: #212529;
+}
+
+.footer {
+    position: relative;
+    height: 40px;
+}
+
+.footer img.icon-start-edit {
+    cursor: pointer;
+    position: absolute;
+    bottom: 14px;
+    right: 55px;
+    width: 18px;
+    height: 18px;
+}
+
+.footer img.icon-end-edit {
+    cursor: pointer;
+    position: absolute;
+    display: none;
+    bottom: 14px;
+    right: 55px;
+    width: 20px;
+    height: 15px;
+}
+
+.footer img.icon-start-delete {
+    cursor: pointer;
+    position: absolute;
+    bottom: 12px;
+    right: 19px;
+    width: 14px;
+    height: 18px;
+}
+
+.footer img.icon-end-delete {
+    cursor: pointer;
+    position: absolute;
+    display: none;
+    bottom: 12px;
+    right: 19px;
+    width: 14px;
+    height: 18px;
+}
+
+
+#cards-box {
+    margin-top: 12px;
+}
