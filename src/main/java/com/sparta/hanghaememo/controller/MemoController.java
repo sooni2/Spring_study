@@ -31,8 +31,7 @@ public class MemoController {
 
     //게시글 전체 조회하기
     @GetMapping("/api/memos")
-    public List<MemoRequestDto> getMemoList(HttpServletRequest request) {
-
+    public List<MemoResponseDto> getMemoList(HttpServletRequest request) {
         return memoService.getMemoList(request);
     }
 

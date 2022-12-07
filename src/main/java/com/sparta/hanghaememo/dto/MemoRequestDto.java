@@ -10,11 +10,14 @@ public class MemoRequestDto {
 
     private String contents;
     private String title;
+
+    private String username;
     private Long id;
 
     public MemoRequestDto(Memo memo) {
         this.contents = memo.getContents();
         this.title = memo.getTitle();
+        this.username = memo.getUsername();
         this.id = memo.getId();
     }
 }

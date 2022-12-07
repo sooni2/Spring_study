@@ -58,7 +58,7 @@ public class MemoService {
 
     //게시글 조회
     @Transactional(readOnly = true)
-    public List<MemoRequestDto> getMemoList(HttpServletRequest request) {
+    public List<MemoResponseDto> getMemoList(HttpServletRequest request) {
         //Request에서 Token 가져오기
         String token = jwtUtil.resolveToken(request);
         Claims claims;
@@ -79,7 +79,7 @@ public class MemoService {
 
             //사용자 권한 가져와서 ADMIN 이면 전체 조회, USER 이면 본인이 작성한 게시글만 조회
             UserRoleEnum userRoleEnum = user.getRole();
-            List<MemoRequestDto> memoRequestDtoList = new ArrayList<>();
+            List<MemoResponseDto> memoResponseDtoList = new ArrayList<>();
             List<Memo> memoList;
 
             if (userRoleEnum == UserRoleEnum.USER) {
@@ -90,10 +90,10 @@ public class MemoService {
             }
 
             for (Memo memo : memoList) {
-                memoRequestDtoList.add(new MemoRequestDto(memo));
+                memoResponseDtoList.add(new MemoResponseDto(memo));
             }
 
-            return memoRequestDtoList;
+            return memoResponseDtoList;
         } else {
             return null;
         }
