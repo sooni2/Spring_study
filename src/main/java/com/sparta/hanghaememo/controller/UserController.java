@@ -1,6 +1,7 @@
 package com.sparta.hanghaememo.controller;
 
 import com.sparta.hanghaememo.dto.LoginRequestDto;
+import com.sparta.hanghaememo.dto.ResponseDto;
 import com.sparta.hanghaememo.dto.SignupRequestDto;
 import com.sparta.hanghaememo.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -35,9 +36,8 @@ public class UserController {
 
     @ResponseBody
     @PostMapping("/login")
-    public String login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response) {
-        userService.login(loginRequestDto, response);
-        return "success";
+    public ResponseDto login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response) {
+        return userService.login(loginRequestDto, response);
     }
 
 }
