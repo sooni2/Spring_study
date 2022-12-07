@@ -2,6 +2,7 @@ package com.sparta.hanghaememo.service;
 
 import com.sparta.hanghaememo.dto.MemoRequestDto;
 import com.sparta.hanghaememo.dto.MemoResponseDto;
+import com.sparta.hanghaememo.dto.ResponseDto;
 import com.sparta.hanghaememo.entity.Memo;
 import com.sparta.hanghaememo.entity.User;
 import com.sparta.hanghaememo.entity.UserRoleEnum;
@@ -11,6 +12,7 @@ import com.sparta.hanghaememo.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,7 +58,7 @@ public class MemoService {
 
     //게시글 조회
     @Transactional(readOnly = true)
-    public List<MemoRequestDto> getMemos(HttpServletRequest request) {
+    public List<MemoRequestDto> getMemoList(HttpServletRequest request) {
         //Request에서 Token 가져오기
         String token = jwtUtil.resolveToken(request);
         Claims claims;
@@ -97,6 +99,15 @@ public class MemoService {
         }
     }
 
+    //게시글 상세 조회
+    @Transactional
+    public MemoResponseDto getMemo(Long id) {
+        Memo memo = memoRepository.findById(id).orElseThrow(
+                () -> new NullPointerException("해당 게시글은 존재하지 않습니다.")
+        );
+        return new MemoResponseDto(memo);
+    }
+
     //게시글 수정
     @Transactional
     public Memo update(Long id, MemoRequestDto requestDto, HttpServletRequest request) {
@@ -130,7 +141,7 @@ public class MemoService {
     }
 
     @Transactional
-    public Long deleteMemo(Long id, HttpServletRequest request) {
+    public ResponseDto deleteMemo(Long id, HttpServletRequest request) {
         //Request에서 Token 가져오기
         String token = jwtUtil.resolveToken(request);
         Claims claims;
@@ -154,9 +165,11 @@ public class MemoService {
             );
 
             memoRepository.deleteById(id);
-            return memo.getId();
+            return new ResponseDto("게시글 삭제 성공", HttpStatus.OK.value());
         } else {
             return null;
         }
     }
+
+
 }
