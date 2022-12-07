@@ -2,6 +2,7 @@ package com.sparta.hanghaememo.controller;
 
 import com.sparta.hanghaememo.dto.MemoRequestDto;
 import com.sparta.hanghaememo.dto.MemoResponseDto;
+import com.sparta.hanghaememo.dto.ResponseDto;
 import com.sparta.hanghaememo.entity.Memo;
 import com.sparta.hanghaememo.service.MemoService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,9 +31,15 @@ public class MemoController {
 
     //게시글 전체 조회하기
     @GetMapping("/api/memos")
-    public List<MemoRequestDto> getMemos(HttpServletRequest request) {
+    public List<MemoRequestDto> getMemoList(HttpServletRequest request) {
 
-        return memoService.getMemos(request);
+        return memoService.getMemoList(request);
+    }
+
+    //게시글 상세 조회하기
+    @GetMapping("/api/memos/{id}")
+    public MemoResponseDto getMemo(@PathVariable Long id) {
+        return memoService.getMemo(id);
     }
 
     //게시글 수정하기
@@ -43,7 +50,7 @@ public class MemoController {
 
     //게시글 삭제하기
     @DeleteMapping("/api/memos/{id}")
-    public Long deleteMemo(@PathVariable Long id, HttpServletRequest request) {
+    public ResponseDto deleteMemo(@PathVariable Long id, HttpServletRequest request) {
         return memoService.deleteMemo(id, request);
     }
 
